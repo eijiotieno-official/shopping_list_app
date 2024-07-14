@@ -7,12 +7,12 @@ import 'package:shopping_list_app/item/models/shopping_item_model.dart';
 
 class ShoppingList {
   final String id;
-  final String title;
+  final String name;
   final Color? color;
   final List<ShoppingItem> items;
   ShoppingList({
     required this.id,
-    required this.title,
+    required this.name,
     this.color,
     required this.items,
   });
@@ -20,13 +20,13 @@ class ShoppingList {
 
   ShoppingList copyWith({
     String? id,
-    String? title,
+    String? name,
     Color? color,
     List<ShoppingItem>? items,
   }) {
     return ShoppingList(
       id: id ?? this.id,
-      title: title ?? this.title,
+      name: name ?? this.name,
       color: color ?? this.color,
       items: items ?? this.items,
     );
@@ -35,7 +35,7 @@ class ShoppingList {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'title': title,
+      'name': name,
       'color': color?.value,
       'items': items.map((x) => x.toMap()).toList(),
     };
@@ -44,7 +44,7 @@ class ShoppingList {
   factory ShoppingList.fromMap(Map<String, dynamic> map) {
     return ShoppingList(
       id: map['id'] ?? '',
-      title: map['title'] ?? '',
+      name: map['name'] ?? '',
       color: map['color'] != null ? Color(map['color']) : null,
       items: List<ShoppingItem>.from(map['items']?.map((x) => ShoppingItem.fromMap(x))),
     );
@@ -56,7 +56,7 @@ class ShoppingList {
 
   @override
   String toString() {
-    return 'ShoppingList(id: $id, title: $title, color: $color, items: $items)';
+    return 'ShoppingList(id: $id, name: $name, color: $color, items: $items)';
   }
 
   @override
@@ -65,7 +65,7 @@ class ShoppingList {
   
     return other is ShoppingList &&
       other.id == id &&
-      other.title == title &&
+      other.name == name &&
       other.color == color &&
       listEquals(other.items, items);
   }
@@ -73,7 +73,7 @@ class ShoppingList {
   @override
   int get hashCode {
     return id.hashCode ^
-      title.hashCode ^
+      name.hashCode ^
       color.hashCode ^
       items.hashCode;
   }

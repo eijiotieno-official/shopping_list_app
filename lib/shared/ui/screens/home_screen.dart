@@ -28,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
         appBar: AppBar(),
         body: const ListsView(),
         floatingActionButton: FloatingActionButton(
+          heroTag: "add",
           onPressed: () {
             Navigator.push(
               context,

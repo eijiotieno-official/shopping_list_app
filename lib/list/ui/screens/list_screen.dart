@@ -9,6 +9,7 @@ import 'package:shopping_list_app/list/models/shopping_list_model.dart';
 import 'package:shopping_list_app/list/notifiers/color_notifier.dart';
 import 'package:shopping_list_app/list/notifiers/id_notifier.dart';
 import 'package:shopping_list_app/list/notifiers/list_notifier.dart';
+import 'package:shopping_list_app/list/services/show_create_list_name.dart';
 import 'package:shopping_list_app/list/ui/components/show_color_picker.dart';
 
 class ListScreen extends HookConsumerWidget {
@@ -25,7 +26,7 @@ class ListScreen extends HookConsumerWidget {
     final id = ref.watch(idProvider);
 
     final TextEditingController titleController =
-        useTextEditingController(text: shoppingList?.title ?? "");
+        useTextEditingController(text: shoppingList?.name ?? "");
     final isFormValid = useState(false);
 
     void validateForm() {
@@ -34,12 +35,17 @@ class ListScreen extends HookConsumerWidget {
     }
 
     useEffect(() {
-      final listId = shoppingList?.id ?? UniqueKey().toString();
-      idNotifier.update(listId);
-      Future.delayed(const Duration(milliseconds: 100), () {
-        colorNotifier.update(shoppingList?.color ?? colors.first);
+      Future.microtask(() {
+        if (shoppingList == null) {
+          showCreateListName(context: context);
+        }
+        final listId = shoppingList?.id ?? UniqueKey().toString();
+        idNotifier.update(listId);
+        Future.delayed(const Duration(milliseconds: 100), () {
+          colorNotifier.update(shoppingList?.color ?? colors.first);
+        });
+        validateForm();
       });
-      validateForm();
       return null;
     }, []);
 
@@ -58,83 +64,153 @@ class ListScreen extends HookConsumerWidget {
       appBar: AppBar(
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.close_rounded),
+          icon: const Hero(tag: "add", child: Icon(Icons.arrow_back_rounded)),
         ),
+        actions: [
+          if (shoppingList != null)
+            IconButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: const Text("Delete"),
+                      content: Text(
+                          "Confirm to delete *(${currentList?.name}) shopping list."),
+                      actionsPadding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 8.0,
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text("Cancel"),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            ref
+                                .read(shoppingListsProvider.notifier)
+                                .deleteShoppingList(shoppingList);
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                          },
+                          child: const Text("Confirm"),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              icon: const Icon(
+                Icons.delete_rounded,
+              ),
+            ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: GestureDetector(
-                onTap: () => showColorPicker(
-                  context: context,
-                  colors: colors,
-                  list: ShoppingList(
-                    id: id.toString(),
-                    title: titleController.text.trim(),
-                    items: items,
-                    color: color,
-                  ),
-                ),
-                child: Container(
-                  width: 45,
-                  height: 45,
-                  decoration: BoxDecoration(
-                    color: color,
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                ),
+            Card(
+              margin: const EdgeInsets.only(
+                bottom: 16.0,
               ),
-              title: TextField(
-                controller: titleController,
-                autofocus: shoppingList == null,
-                decoration: const InputDecoration(
-                  labelText: "List name",
+              child: ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: GestureDetector(
+                    onTap: () => showColorPicker(
+                      context: context,
+                      colors: colors,
+                      list: ShoppingList(
+                        id: id.toString(),
+                        name: titleController.text.trim(),
+                        items: items,
+                        color: color,
+                      ),
+                    ),
+                    child: Container(
+                      width: 45,
+                      height: 45,
+                      decoration: BoxDecoration(
+                        color: color,
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                  ),
+                ),
+                title: TextField(
+                  controller: titleController,
+                  autofocus: shoppingList == null,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    hintText: "List Name",
+                  ),
+                  onChanged: (v) {
+                    ref
+                        .read(shoppingListsProvider.notifier)
+                        .updateShoppingList(ShoppingList(
+                          id: id.toString(),
+                          name: titleController.text.trim(),
+                          items: items,
+                          color: color,
+                        ));
+                  },
                 ),
               ),
             ),
             if (titleController.text.trim().isNotEmpty)
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(
-                  "Items ${items.length}",
-                  style: TextStyle(
-                    color: Theme.of(context)
-                        .textTheme
-                        .bodyLarge
-                        ?.color
-                        ?.withOpacity(0.5),
-                  ),
-                ),
-                trailing: FilledButton.tonalIcon(
-                  onPressed: () {
-                    showCreateItem(
-                      context: context,
-                      list: ShoppingList(
-                        id: id.toString(),
-                        title: titleController.text.trim(),
-                        items: items,
-                        color: color,
+              Flexible(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                      title: Text(
+                        "Items ${items.length}",
+                        style: TextStyle(
+                          color: Theme.of(context)
+                              .textTheme
+                              .bodyLarge
+                              ?.color
+                              ?.withOpacity(0.5),
+                        ),
                       ),
-                    );
-                  },
-                  icon: const Icon(Icons.add_rounded),
-                  label: const Text("Add"),
+                    ),
+                    Flexible(
+                      child: ListView.builder(
+                        itemCount: items.length,
+                        itemBuilder: (context, index) {
+                          return ItemView(
+                              item: items[index], list: currentList);
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: items.length,
-                itemBuilder: (context, index) {
-                  return ItemView(item: items[index], list: currentList);
-                },
-              ),
-            ),
           ],
         ),
       ),
+      floatingActionButton: titleController.text.trim().isEmpty
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: () {
+                showCreateItem(
+                  context: context,
+                  list: ShoppingList(
+                    id: id.toString(),
+                    name: titleController.text.trim(),
+                    items: items,
+                    color: color,
+                  ),
+                );
+              },
+              label: const Text("Add Item"),
+              icon: const Icon(Icons.add_rounded),
+            ),
     );
   }
 }

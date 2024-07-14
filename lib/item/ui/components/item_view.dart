@@ -18,26 +18,23 @@ class ItemView extends HookConsumerWidget {
 
     final count = item.count ?? 0;
 
-    return Card(
-      margin: EdgeInsets.zero,
-      child: ListTile(
-        leading: Checkbox(
-          value: item.bought,
-          onChanged: (value) {
-            int index = items.indexWhere((i) => i.id == item.id);
-            items[index] =
-                item.copyWith(bought: item.bought == true ? false : true);
-            ref
-                .read(shoppingListsProvider.notifier)
-                .updateShoppingList(list?.copyWith(items: items));
-          },
-        ),
-        title: Row(
-          children: [
-            Expanded(child: Text(item.name)),
-            if (count > 0) Text(count.toString()),
-          ],
-        ),
+    return ListTile(
+      leading: Checkbox(
+        value: item.bought,
+        onChanged: (value) {
+          int index = items.indexWhere((i) => i.id == item.id);
+          items[index] =
+              item.copyWith(bought: item.bought == true ? false : true);
+          ref
+              .read(shoppingListsProvider.notifier)
+              .updateShoppingList(list?.copyWith(items: items));
+        },
+      ),
+      title: Row(
+        children: [
+          Expanded(child: Text(item.name)),
+          if (count > 0) Text(count.toString()),
+        ],
       ),
     );
   }

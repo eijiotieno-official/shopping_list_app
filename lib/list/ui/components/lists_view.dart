@@ -24,9 +24,11 @@ class ListsView extends HookConsumerWidget {
           itemBuilder: (context, index) {
             final color = data[index].color;
 
-            final title = data[index].title;
+            final title = data[index].name;
 
             final items = data[index].items;
+
+            bool notAllBought = items.any((i) => i.bought == false);
 
             return GestureDetector(
               onTap: () {
@@ -51,7 +53,7 @@ class ListsView extends HookConsumerWidget {
                     children: [
                       DecoratedBox(
                         decoration: BoxDecoration(
-                          color: color?.withOpacity(0.50),
+                          color: notAllBought ? color?.withOpacity(0.50) : color?.withOpacity(0.05),
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                         child: Padding(
@@ -80,8 +82,10 @@ class ListsView extends HookConsumerWidget {
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: items.length,
                             itemBuilder: (context, index) {
-                              return Text(
-                                  "${items[index].count} ${items[index].name}");
+                              return items[index].bought
+                                  ? const SizedBox.shrink()
+                                  : Text(
+                                      "${index + 1}. ${items[index].name} ${items[index].count}");
                             },
                           ),
                         ),
