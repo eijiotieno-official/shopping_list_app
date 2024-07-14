@@ -8,29 +8,20 @@ import 'package:shopping_list_app/item/models/shopping_item_model.dart';
 import 'package:shopping_list_app/list/models/shopping_list_model.dart';
 import 'package:shopping_list_app/list/notifiers/list_notifier.dart';
 
-Future<void> showCreateItem({
-  required BuildContext context,
-  required ShoppingList? list,
-}) async =>
-    await showModalBottomSheet(
-      useSafeArea: true,
-      isScrollControlled: true,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      showDragHandle: true,
-      context: context,
-      builder: (context) {
-        return CreateItemView(list: list);
-      },
-    );
-
 class CreateItemView extends HookConsumerWidget {
-  final ShoppingList? list;
-  const CreateItemView({super.key, this.list});
+  final ShoppingList shoppingList;
+  final ShoppingItem? shoppingItem;
+  const CreateItemView({
+    super.key,
+    required this.shoppingList,
+    this.shoppingItem,
+  });
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final nameController = useTextEditingController();
+    final nameController =
+        useTextEditingController(text: shoppingItem?.name ?? "");
 
-    final imagePathState = useState<String?>(null);
+    final imagePathState = useState<String?>(shoppingItem?.imagePath);
 
     String? imagePath = imagePathState.value;
 
@@ -42,9 +33,11 @@ class CreateItemView extends HookConsumerWidget {
       }
     }
 
-    final priceController = useTextEditingController();
+    final priceController =
+        useTextEditingController(text: shoppingItem?.price.toString() ?? "");
 
-    final countController = useTextEditingController();
+    final countController =
+        useTextEditingController(text: shoppingItem?.count.toString() ?? "");
 
     final isFormValid = useState(false);
 
@@ -77,18 +70,17 @@ class CreateItemView extends HookConsumerWidget {
         imagePath: imagePath,
       );
 
-      final items = list?.items ?? [];
+      final items = shoppingList.items;
 
-      if (items.isEmpty) {
-        await ref
-            .read(shoppingListsProvider.notifier)
-            .addShoppingList(list?.copyWith(items: [item]));
-      } else {
+      if (shoppingItem == null) {
         items.add(item);
-        await ref
-            .read(shoppingListsProvider.notifier)
-            .updateShoppingList(list?.copyWith(items: items));
+      } else {
+        int index = items.indexWhere((i) => i.id == shoppingItem?.id);
+        items[index] = item.copyWith(id: shoppingItem?.id);
       }
+      await ref
+          .read(shoppingListsProvider.notifier)
+          .updateShoppingList(shoppingList.copyWith(items: items));
     }
 
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;

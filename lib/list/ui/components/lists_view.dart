@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shopping_list_app/list/notifiers/color_notifier.dart';
 import 'package:shopping_list_app/list/notifiers/list_notifier.dart';
 import 'package:shopping_list_app/list/ui/screens/list_screen.dart';
 
@@ -8,6 +9,9 @@ class ListsView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final shoppingListsState = ref.watch(shoppingListsProvider);
+    final colorNotifier = ref.read(colorProvider.notifier);
+    final colors = colorNotifier.colors;
+
 
     return shoppingListsState.when(
       data: (data) => Padding(
@@ -22,7 +26,7 @@ class ListsView extends HookConsumerWidget {
           ),
           itemCount: data.length,
           itemBuilder: (context, index) {
-            final color = data[index].color;
+            final color = data[index].color ?? colors.first;
 
             final title = data[index].name;
 
@@ -53,7 +57,7 @@ class ListsView extends HookConsumerWidget {
                     children: [
                       DecoratedBox(
                         decoration: BoxDecoration(
-                          color: notAllBought ? color?.withOpacity(0.50) : color?.withOpacity(0.05),
+                          color: notAllBought ? color.withOpacity(0.50) : color.withOpacity(0.05),
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                         child: Padding(

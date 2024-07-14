@@ -1,10 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:shopping_list_app/list/models/shopping_list_model.dart';
-import 'package:shopping_list_app/list/ui/components/create_list_name_view.dart';
 
-Future<void> showCreateListName({
+import 'package:flutter/material.dart';
+import 'package:shopping_list_app/item/ui/components/create_item_view.dart';
+import 'package:shopping_list_app/list/models/shopping_list_model.dart';
+
+Future<void> showCreateItem({
   required BuildContext context,
-  ShoppingList? shoppingList,
+  required ShoppingList shoppingList,
 }) async =>
     await showModalBottomSheet(
       useSafeArea: true,
@@ -13,6 +14,7 @@ Future<void> showCreateListName({
       showDragHandle: true,
       context: context,
       builder: (context) {
-        return CreateListNameView(shoppingList);
+        return CreateItemView(shoppingList: shoppingList);
       },
     );
+

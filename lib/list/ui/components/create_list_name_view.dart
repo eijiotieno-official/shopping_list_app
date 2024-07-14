@@ -80,7 +80,7 @@ class CreateListNameView extends HookConsumerWidget {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) {
-                                    return const ListScreen();
+                                    return  ListScreen(shoppingList: shoppingList!);
                                   },
                                 ),
                               );
