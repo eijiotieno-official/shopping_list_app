@@ -3,9 +3,11 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopping_list_app/list/models/shopping_list_model.dart';
 import 'package:shopping_list_app/list/notifiers/list_notifier.dart';
+import 'package:shopping_list_app/list/ui/screens/list_screen.dart';
 
 class CreateListNameView extends HookConsumerWidget {
   final ShoppingList? shoppingList;
+
   const CreateListNameView(this.shoppingList, {super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -70,7 +72,21 @@ class CreateListNameView extends HookConsumerWidget {
               child: FilledButton(
                 onPressed: isFormValid.value
                     ? () async {
-                        await save().then((_) => Navigator.pop(context));
+                        await save().then(
+                          (_) {
+                            Navigator.pop(context);
+                            if (shoppingList == null) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) {
+                                    return const ListScreen();
+                                  },
+                                ),
+                              );
+                            }
+                          },
+                        );
                       }
                     : null,
                 child: const Text("Save"),

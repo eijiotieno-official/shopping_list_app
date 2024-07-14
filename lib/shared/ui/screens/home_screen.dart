@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shopping_list_app/list/services/show_create_list_name.dart';
 import 'package:shopping_list_app/list/ui/components/lists_view.dart';
 import 'package:shopping_list_app/list/ui/screens/list_screen.dart';
 
@@ -30,14 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
         floatingActionButton: FloatingActionButton(
           heroTag: "add",
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return  const ListScreen();
-                },
-              ),
-            );
+            showCreateListName(context: context);
           },
           child: const Icon(Icons.add_rounded),
         ),

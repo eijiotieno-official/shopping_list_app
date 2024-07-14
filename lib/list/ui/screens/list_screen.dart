@@ -9,8 +9,7 @@ import 'package:shopping_list_app/list/models/shopping_list_model.dart';
 import 'package:shopping_list_app/list/notifiers/color_notifier.dart';
 import 'package:shopping_list_app/list/notifiers/id_notifier.dart';
 import 'package:shopping_list_app/list/notifiers/list_notifier.dart';
-import 'package:shopping_list_app/list/services/show_create_list_name.dart';
-import 'package:shopping_list_app/list/ui/components/show_color_picker.dart';
+import 'package:shopping_list_app/list/services/show_pick_color.dart';
 
 class ListScreen extends HookConsumerWidget {
   final ShoppingList? shoppingList;
@@ -36,9 +35,6 @@ class ListScreen extends HookConsumerWidget {
 
     useEffect(() {
       Future.microtask(() {
-        if (shoppingList == null) {
-          showCreateListName(context: context);
-        }
         final listId = shoppingList?.id ?? UniqueKey().toString();
         idNotifier.update(listId);
         Future.delayed(const Duration(milliseconds: 100), () {
@@ -122,10 +118,10 @@ class ListScreen extends HookConsumerWidget {
                 leading: Padding(
                   padding: const EdgeInsets.only(left: 8.0),
                   child: GestureDetector(
-                    onTap: () => showColorPicker(
+                    onTap: () => showPickColor(
                       context: context,
                       colors: colors,
-                      list: ShoppingList(
+                      shoppingList: ShoppingList(
                         id: id.toString(),
                         name: titleController.text.trim(),
                         items: items,
