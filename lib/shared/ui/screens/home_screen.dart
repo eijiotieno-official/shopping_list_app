@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shopping_list_app/list/ui/components/lists_view.dart';
 import 'package:shopping_list_app/list/ui/screens/list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -24,6 +25,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 : Brightness.dark,
       ),
       child: Scaffold(
+        appBar: AppBar(),
+        body: const ListsView(),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             Navigator.push(
