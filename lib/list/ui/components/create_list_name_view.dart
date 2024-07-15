@@ -42,11 +42,27 @@ class CreateListNameView extends HookConsumerWidget {
       if (shoppingList == null) {
         await ref
             .read(shoppingListsProvider.notifier)
-            .addShoppingList(updatedShoppingList);
+            .addShoppingList(updatedShoppingList)
+            .then(
+          (_) async {
+            Navigator.pop(context);
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return ListScreen(shoppingList: updatedShoppingList);
+                },
+              ),
+            );
+          },
+        );
       } else {
         await ref
             .read(shoppingListsProvider.notifier)
-            .updateShoppingList(updatedShoppingList);
+            .updateShoppingList(updatedShoppingList)
+            .then(
+              (_) => Navigator.pop(context),
+            );
       }
     }
 
@@ -72,21 +88,7 @@ class CreateListNameView extends HookConsumerWidget {
               child: FilledButton(
                 onPressed: isFormValid.value
                     ? () async {
-                        await save().then(
-                          (_) {
-                            Navigator.pop(context);
-                            if (shoppingList == null) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) {
-                                    return  ListScreen(shoppingList: shoppingList!);
-                                  },
-                                ),
-                              );
-                            }
-                          },
-                        );
+                        await save();
                       }
                     : null,
                 child: const Text("Save"),

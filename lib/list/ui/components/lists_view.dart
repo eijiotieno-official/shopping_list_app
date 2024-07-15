@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:shopping_list_app/list/notifiers/color_notifier.dart';
 import 'package:shopping_list_app/list/notifiers/list_notifier.dart';
-import 'package:shopping_list_app/list/ui/screens/list_screen.dart';
+import 'package:shopping_list_app/list/ui/components/list_item.dart';
 
 class ListsView extends HookConsumerWidget {
   const ListsView({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final shoppingListsState = ref.watch(shoppingListsProvider);
-    final colorNotifier = ref.read(colorProvider.notifier);
-    final colors = colorNotifier.colors;
-
 
     return shoppingListsState.when(
       data: (data) => Padding(
@@ -26,79 +22,7 @@ class ListsView extends HookConsumerWidget {
           ),
           itemCount: data.length,
           itemBuilder: (context, index) {
-            final color = data[index].color ?? colors.first;
-
-            final title = data[index].name;
-
-            final items = data[index].items;
-
-            bool notAllBought = items.any((i) => i.bought == false);
-
-            return GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return ListScreen(shoppingList: data[index]);
-                    },
-                  ),
-                );
-              },
-              child: Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16.0),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: notAllBought ? color.withOpacity(0.50) : color.withOpacity(0.05),
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8.0,
-                            vertical: 4.0,
-                          ),
-                          child: Text(
-                            title,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.fontSize,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: ListView.builder(
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: items.length,
-                            itemBuilder: (context, index) {
-                              return items[index].bought
-                                  ? const SizedBox.shrink()
-                                  : Text(
-                                      "${index + 1}. ${items[index].name} ${items[index].count}");
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
+            return ListItem(list: data[index]);
           },
         ),
       ),
