@@ -1,11 +1,12 @@
-
 import 'package:flutter/material.dart';
+import 'package:shopping_list_app/item/models/shopping_item_model.dart';
 import 'package:shopping_list_app/item/ui/components/create_item_view.dart';
 import 'package:shopping_list_app/list/models/shopping_list_model.dart';
 
 Future<void> showCreateItem({
   required BuildContext context,
   required ShoppingList shoppingList,
+  ShoppingItem? shoppingItem,
 }) async =>
     await showModalBottomSheet(
       useSafeArea: true,
@@ -14,7 +15,9 @@ Future<void> showCreateItem({
       showDragHandle: true,
       context: context,
       builder: (context) {
-        return CreateItemView(shoppingList: shoppingList);
+        return CreateItemView(
+          shoppingList: shoppingList,
+          shoppingItem: shoppingItem,
+        );
       },
     );
-

@@ -37,6 +37,7 @@ class CreateListNameView extends HookConsumerWidget {
         id: id,
         name: nameController.text.trim(),
         items: items,
+        color: shoppingList?.color,
       );
 
       if (shoppingList == null) {

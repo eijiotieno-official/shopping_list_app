@@ -1,16 +1,15 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class FullImageView extends StatelessWidget {
-  final String imagePath;
-  const FullImageView({super.key, required this.imagePath});
+  final Uint8List imageData;
+  const FullImageView({super.key, required this.imageData});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Center(child: Image.file(File(imagePath))),
+      body: Center(child: Image.memory(imageData)),
     );
   }
 }

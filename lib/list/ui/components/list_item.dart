@@ -74,7 +74,7 @@ class ListItem extends HookConsumerWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: items.length,
                     itemBuilder: (context, index) {
-                      int count = items[index].count ?? 0;
+                      int count = items[index].count ;
                       return items[index].bought
                           ? const SizedBox.shrink()
                           : Text.rich(

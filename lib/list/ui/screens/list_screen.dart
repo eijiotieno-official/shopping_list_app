@@ -20,6 +20,16 @@ class ListScreen extends HookConsumerWidget {
         listState.value?.firstWhereOrNull((l) => l.id == shoppingList.id);
 
     final List<ShoppingItem> items = currentList?.items ?? [];
+    items.sort((a, b) => a.bought == b.bought ? 0 : (a.bought ? 1 : -1));
+
+    String totalPrice() {
+      double total = 0.0;
+      for (var element in items) {
+        total = total + element.price;
+      }
+
+      return total.toString();
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -81,27 +91,46 @@ class ListScreen extends HookConsumerWidget {
                 children: [
                   ListTile(
                     contentPadding: EdgeInsets.zero,
-                    title: Text(
-                      "Items ${items.length}",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Theme.of(context)
-                            .textTheme
-                            .bodyLarge
-                            ?.color
-                            ?.withOpacity(0.5),
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Items ${items.length}",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Theme.of(context)
+                                .textTheme
+                                .bodyLarge
+                                ?.color
+                                ?.withOpacity(0.5),
+                          ),
+                        ),
+                        Text(
+                          "\$ ${totalPrice()}",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.primary,
+                            fontSize: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.fontSize,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (currentList != null)
+                    Flexible(
+                      child: ListView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        itemCount: items.length,
+                        itemBuilder: (context, index) {
+                          return ItemView(
+                              shoppingItem: items[index],
+                              shoppingList: currentList);
+                        },
                       ),
                     ),
-                  ),
-                  Flexible(
-                    child: ListView.builder(
-                      physics: const BouncingScrollPhysics(),
-                      itemCount: items.length,
-                      itemBuilder: (context, index) {
-                        return ItemView(item: items[index], shoppingList: currentList);
-                      },
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -112,7 +141,7 @@ class ListScreen extends HookConsumerWidget {
           ? null
           : FloatingActionButton.extended(
               onPressed: () async {
-               await showCreateItem(
+                await showCreateItem(
                   context: context,
                   shoppingList: currentList,
                 );

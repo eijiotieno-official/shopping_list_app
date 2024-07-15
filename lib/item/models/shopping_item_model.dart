@@ -1,21 +1,22 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+
 class ShoppingItem {
   final String id;
   final String name;
-  final int? count;
-  final double? price;
+  final int count;
+  final double price;
   final bool bought;
-  final String? imagePath;
+  final List<int> imageData;
   ShoppingItem({
     required this.id,
     required this.name,
-    this.count,
-    this.price,
-    this.bought = false,
-    this.imagePath,
+    required this.count,
+    required this.price,
+    required this.bought,
+    required this.imageData,
   });
-
 
   ShoppingItem copyWith({
     String? id,
@@ -23,7 +24,7 @@ class ShoppingItem {
     int? count,
     double? price,
     bool? bought,
-    String? imagePath,
+    List<int>? imageData,
   }) {
     return ShoppingItem(
       id: id ?? this.id,
@@ -31,7 +32,7 @@ class ShoppingItem {
       count: count ?? this.count,
       price: price ?? this.price,
       bought: bought ?? this.bought,
-      imagePath: imagePath ?? this.imagePath,
+      imageData: imageData ?? this.imageData,
     );
   }
 
@@ -42,7 +43,7 @@ class ShoppingItem {
       'count': count,
       'price': price,
       'bought': bought,
-      'imagePath': imagePath,
+      'imageData': imageData,
     };
   }
 
@@ -50,10 +51,10 @@ class ShoppingItem {
     return ShoppingItem(
       id: map['id'] ?? '',
       name: map['name'] ?? '',
-      count: map['count']?.toInt(),
-      price: map['price']?.toDouble(),
-      bought: map['bought'],
-      imagePath: map['imagePath'],
+      count: map['count']?.toInt() ?? 0,
+      price: map['price']?.toDouble() ?? 0.0,
+      bought: map['bought'] ?? false,
+      imageData: List<int>.from(map['imageData']),
     );
   }
 
@@ -63,7 +64,7 @@ class ShoppingItem {
 
   @override
   String toString() {
-    return 'ShoppingItem(id: $id, name: $name, count: $count, price: $price, bought: $bought, imagePath: $imagePath)';
+    return 'ShoppingItem(id: $id, name: $name, count: $count, price: $price, bought: $bought, imageData: $imageData)';
   }
 
   @override
@@ -76,7 +77,7 @@ class ShoppingItem {
       other.count == count &&
       other.price == price &&
       other.bought == bought &&
-      other.imagePath == imagePath;
+      listEquals(other.imageData, imageData);
   }
 
   @override
@@ -86,6 +87,6 @@ class ShoppingItem {
       count.hashCode ^
       price.hashCode ^
       bought.hashCode ^
-      imagePath.hashCode;
+      imageData.hashCode;
   }
 }

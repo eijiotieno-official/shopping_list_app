@@ -26,8 +26,11 @@ class ListsView extends HookConsumerWidget {
           },
         ),
       ),
-      error: (error, stackTrace) =>
-          const Center(child: Text("Error fetching shopping lists")),
+      error: (error, stackTrace) => Center(
+          child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Text("Error fetching shopping lists $error"),
+      )),
       loading: () => const Center(child: CircularProgressIndicator()),
     );
   }

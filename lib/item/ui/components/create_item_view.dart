@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -21,15 +22,21 @@ class CreateItemView extends HookConsumerWidget {
     final nameController =
         useTextEditingController(text: shoppingItem?.name ?? "");
 
-    final imagePathState = useState<String?>(shoppingItem?.imagePath);
+    final imageDataState = useState<List<int>?>(shoppingItem == null
+        ? null
+        : shoppingItem!.imageData.isEmpty
+            ? null
+            : shoppingItem?.imageData);
 
-    String? imagePath = imagePathState.value;
+    List<int>? imageData = imageDataState.value;
 
     Future<void> pickImage(ImageSource source) async {
       ImagePicker picker = ImagePicker();
-      final result = await picker.pickImage(source: source);
+      final result = await picker.pickImage(source: source, imageQuality: 50);
       if (result != null) {
-        imagePathState.value = result.path;
+        final file = File(result.path);
+        final data = await file.readAsBytes();
+        imageDataState.value = data;
       }
     }
 
@@ -55,11 +62,11 @@ class CreateItemView extends HookConsumerWidget {
 
     Future<void> save() async {
       final count = countController.text.trim().isEmpty
-          ? null
+          ? 0
           : int.parse(countController.text.trim());
 
       final price = priceController.text.trim().isEmpty
-          ? null
+          ? 0.0
           : double.parse(priceController.text.trim());
 
       ShoppingItem item = ShoppingItem(
@@ -67,7 +74,8 @@ class CreateItemView extends HookConsumerWidget {
         name: nameController.text.trim(),
         count: count,
         price: price,
-        imagePath: imagePath,
+        bought: false,
+        imageData: imageData ?? [],
       );
 
       final items = shoppingList.items;
@@ -146,21 +154,19 @@ class CreateItemView extends HookConsumerWidget {
               horizontal: 16.0,
             ),
             child: SizedBox(
-              height: keyboardHeight == 0.0 && imagePath != null
+              height: keyboardHeight == 0.0 && imageData != null
                   ? MediaQuery.of(context).size.width * 0.60
                   : MediaQuery.of(context).size.width * 0.20,
               width: double.infinity,
-              child: imagePath != null
+              child: imageData != null
                   ? ClipRRect(
                       borderRadius: BorderRadius.circular(8.0),
                       child: Stack(
                         fit: StackFit.expand,
                         alignment: Alignment.center,
                         children: [
-                          Image.file(
-                            File(imagePath),
-                            fit: BoxFit.cover,
-                          ),
+                          Image.memory(Uint8List.fromList(imageData),
+                              fit: BoxFit.cover),
                           Center(
                             child: IconButton.filledTonal(
                               style: ButtonStyle(
@@ -170,7 +176,7 @@ class CreateItemView extends HookConsumerWidget {
                                     Colors.black.withOpacity(0.65)),
                               ),
                               onPressed: () {
-                                imagePathState.value = null;
+                                imageDataState.value = null;
                               },
                               icon: const Icon(
                                 Icons.close_rounded,
@@ -235,16 +241,68 @@ class CreateItemView extends HookConsumerWidget {
               vertical: 8.0,
               horizontal: 16.0,
             ),
-            child: SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: isFormValid.value
-                    ? () async {
-                        await save().then((_) => Navigator.pop(context));
-                      }
-                    : null,
-                child: const Text("Save"),
-              ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: FilledButton(
+                      onPressed: isFormValid.value
+                          ? () async {
+                              await save().then((_) => Navigator.pop(context));
+                            }
+                          : null,
+                      child: Text(shoppingItem == null ? "Save" : "Update"),
+                    ),
+                  ),
+                ),
+                if (shoppingItem != null)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: IconButton.filledTonal(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text("Delete"),
+                              content: Text(
+                                  "Confirm to delete *(${shoppingItem?.name}) item."),
+                              actionsPadding: const EdgeInsets.symmetric(
+                                horizontal: 16.0,
+                                vertical: 8.0,
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text("Cancel"),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    final updatedList = shoppingList;
+                                    updatedList.items.removeWhere(
+                                        (i) => i.id == shoppingItem?.id);
+                                    ref
+                                        .read(shoppingListsProvider.notifier)
+                                        .updateShoppingList(updatedList);
+                                    Navigator.pop(context);
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text("Confirm"),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      icon: const Icon(
+                        Icons.delete_rounded,
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
           SizedBox(height: keyboardHeight),
