@@ -61,6 +61,8 @@ class CreateItemView extends HookConsumerWidget {
     }, [nameController]);
 
     Future<void> save() async {
+      final id = shoppingItem?.id ?? UniqueKey().toString();
+
       final count = countController.text.trim().isEmpty
           ? 0
           : int.parse(countController.text.trim());
@@ -69,12 +71,14 @@ class CreateItemView extends HookConsumerWidget {
           ? 0.0
           : double.parse(priceController.text.trim());
 
+      final bought = shoppingItem?.bought ?? false;
+
       ShoppingItem item = ShoppingItem(
-        id: UniqueKey().toString(),
+        id: id,
         name: nameController.text.trim(),
         count: count,
         price: price,
-        bought: false,
+        bought: bought,
         imageData: imageData ?? [],
       );
 
@@ -84,7 +88,7 @@ class CreateItemView extends HookConsumerWidget {
         items.add(item);
       } else {
         int index = items.indexWhere((i) => i.id == shoppingItem?.id);
-        items[index] = item.copyWith(id: shoppingItem?.id);
+        items[index] = item;
       }
       await ref
           .read(shoppingListsProvider.notifier)
@@ -145,6 +149,7 @@ class CreateItemView extends HookConsumerWidget {
                   borderRadius: BorderRadius.circular(8.0),
                 ),
                 labelText: "Price",
+                prefixText: "\$ ",
               ),
             ),
           ),
@@ -241,68 +246,16 @@ class CreateItemView extends HookConsumerWidget {
               vertical: 8.0,
               horizontal: 16.0,
             ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: FilledButton(
-                      onPressed: isFormValid.value
-                          ? () async {
-                              await save().then((_) => Navigator.pop(context));
-                            }
-                          : null,
-                      child: Text(shoppingItem == null ? "Save" : "Update"),
-                    ),
-                  ),
-                ),
-                if (shoppingItem != null)
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: IconButton.filledTonal(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text("Delete"),
-                              content: Text(
-                                  "Confirm to delete *(${shoppingItem?.name}) item."),
-                              actionsPadding: const EdgeInsets.symmetric(
-                                horizontal: 16.0,
-                                vertical: 8.0,
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text("Cancel"),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    final updatedList = shoppingList;
-                                    updatedList.items.removeWhere(
-                                        (i) => i.id == shoppingItem?.id);
-                                    ref
-                                        .read(shoppingListsProvider.notifier)
-                                        .updateShoppingList(updatedList);
-                                    Navigator.pop(context);
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text("Confirm"),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                      icon: const Icon(
-                        Icons.delete_rounded,
-                      ),
-                    ),
-                  ),
-              ],
+            child: SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: isFormValid.value || imageData != null
+                    ? () async {
+                        await save().then((_) => Navigator.pop(context));
+                      }
+                    : null,
+                child: Text(shoppingItem == null ? "Save" : "Update"),
+              ),
             ),
           ),
           SizedBox(height: keyboardHeight),

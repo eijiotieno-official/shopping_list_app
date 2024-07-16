@@ -63,31 +63,26 @@ class ItemView extends HookConsumerWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            shoppingItem.name,
-                            style: TextStyle(
-                              fontSize: Theme.of(context)
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        shoppingItem.name,
+                        style: TextStyle(
+                          fontSize:
+                              Theme.of(context).textTheme.bodyLarge?.fontSize,
+                          fontWeight: FontWeight.w500,
+                          decoration: shoppingItem.bought
+                              ? TextDecoration.lineThrough
+                              : null,
+                          color: shoppingItem.bought
+                              ? Theme.of(context)
                                   .textTheme
                                   .bodyLarge
-                                  ?.fontSize,
-                              fontWeight: FontWeight.w500,
-                              decoration: shoppingItem.bought
-                                  ? TextDecoration.lineThrough
-                                  : null,
-                              color: shoppingItem.bought
-                                  ? Theme.of(context).textTheme.bodyLarge?.color?.withOpacity(0.5)
-                                  : Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge
-                                      ?.color,
-                            ),
-                          ),
+                                  ?.color
+                                  ?.withOpacity(0.5)
+                              : Theme.of(context).textTheme.bodyLarge?.color,
                         ),
-                        if (count > 0) Text(count.toString()),
-                      ],
+                      ),
                     ),
                     if (shoppingItem.imageData.isNotEmpty)
                       Align(
@@ -95,7 +90,7 @@ class ItemView extends HookConsumerWidget {
                         child: Padding(
                           padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
                           child: SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.2,
+                            height: MediaQuery.of(context).size.height * 0.15,
                             child: GestureDetector(
                               onTap: () {
                                 Navigator.push(
@@ -130,22 +125,77 @@ class ItemView extends HookConsumerWidget {
                           ),
                         ),
                       ),
-                    if (shoppingItem.price > 0)
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Text(
-                          "\$ ${shoppingItem.price.toString()}",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.primary,
-                            fontSize:
-                                Theme.of(context).textTheme.bodyLarge?.fontSize,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        if (count > 0)
+                          Text(
+                            "* ${count.toString()}",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge
+                                  ?.fontSize,
+                            ),
                           ),
-                        ),
-                      ),
+                        if (shoppingItem.price > 0)
+                          Text(
+                            "\$ ${shoppingItem.price.toString()}",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.primary,
+                              fontSize: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge
+                                  ?.fontSize,
+                            ),
+                          ),
+                      ],
+                    ),
                   ],
                 ),
               ),
+              if (shoppingItem.bought == false)
+                IconButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text("Delete"),
+                          content: Text(
+                              "Confirm to delete *(${shoppingItem.name}) item."),
+                          actionsPadding: const EdgeInsets.symmetric(
+                            horizontal: 16.0,
+                            vertical: 8.0,
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text("Cancel"),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                final updatedList = shoppingList;
+                                updatedList.items.removeWhere(
+                                    (i) => i.id == shoppingItem.id);
+                                ref
+                                    .read(shoppingListsProvider.notifier)
+                                    .updateShoppingList(updatedList);
+                                Navigator.pop(context);
+                              },
+                              child: const Text("Confirm"),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  icon: const Icon(Icons.close_rounded),
+                ),
             ],
           ),
         ),

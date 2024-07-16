@@ -55,15 +55,38 @@ class ListItem extends HookConsumerWidget {
                     horizontal: 8.0,
                     vertical: 4.0,
                   ),
-                  child: Text(
-                    title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize:
-                          Theme.of(context).textTheme.titleMedium?.fontSize,
-                    ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize:
+                                Theme.of(context).textTheme.titleMedium?.fontSize,
+                          ),
+                        ),
+                      ),
+                      if (items.where((i) => i.bought == true).toList().length <
+                          items.length)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Text(
+                            "(${items.where((i) => i.bought == true).toList().length}/${items.length})",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge
+                                  ?.color
+                                  ?.withOpacity(0.5),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ),
@@ -74,10 +97,12 @@ class ListItem extends HookConsumerWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: items.length,
                     itemBuilder: (context, index) {
-                      int count = items[index].count ;
+                      int count = items[index].count;
                       return items[index].bought
                           ? const SizedBox.shrink()
                           : Text.rich(
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               TextSpan(
                                 children: <InlineSpan>[
                                   TextSpan(

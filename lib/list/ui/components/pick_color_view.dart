@@ -14,7 +14,11 @@ class PickColorView extends HookConsumerWidget {
   });
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final color = ref.watch(colorProvider);
+    Color color = ref.watch(colorProvider);
+
+    if (shoppingList.color != null) {
+      color = shoppingList.color!;
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),

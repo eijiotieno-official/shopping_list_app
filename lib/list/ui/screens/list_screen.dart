@@ -95,7 +95,7 @@ class ListScreen extends HookConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Items ${items.length}",
+                          "Items (${items.where((i) => i.bought == true).toList().length}/${items.length})",
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Theme.of(context)
@@ -105,6 +105,7 @@ class ListScreen extends HookConsumerWidget {
                                 ?.withOpacity(0.5),
                           ),
                         ),
+                        if(totalPrice() != 0.0.toString())
                         Text(
                           "\$ ${totalPrice()}",
                           style: TextStyle(
