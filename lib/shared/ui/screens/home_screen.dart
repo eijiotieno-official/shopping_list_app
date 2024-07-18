@@ -25,7 +25,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 : Brightness.dark,
       ),
       child: Scaffold(
-        appBar: AppBar(),
+        appBar: AppBar(
+          centerTitle: true,
+          title: const Text("Shopping List"),
+        ),
         body: const ListsView(),
         floatingActionButton: FloatingActionButton(
           heroTag: "add",

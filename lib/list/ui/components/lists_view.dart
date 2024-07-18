@@ -10,27 +10,35 @@ class ListsView extends HookConsumerWidget {
     final shoppingListsState = ref.watch(shoppingListsProvider);
 
     return shoppingListsState.when(
-      data: (data) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: GridView.builder(
-          physics: const BouncingScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 0.75,
-            mainAxisSpacing: 4.0,
-            crossAxisSpacing: 4.0,
-          ),
-          itemCount: data.length,
-          itemBuilder: (context, index) {
-            return ListItem(list: data[index]);
-          },
+      data: (data) => data.isEmpty
+          ? const Center(
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text("It's seems there are no shopping lists"),
+              ),
+            )
+          : Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: GridView.builder(
+                physics: const BouncingScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.75,
+                  mainAxisSpacing: 4.0,
+                  crossAxisSpacing: 4.0,
+                ),
+                itemCount: data.length,
+                itemBuilder: (context, index) {
+                  return ListItem(list: data[index]);
+                },
+              ),
+            ),
+      error: (error, stackTrace) => Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text("Error fetching shopping lists $error"),
         ),
       ),
-      error: (error, stackTrace) => Center(
-          child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Text("Error fetching shopping lists $error"),
-      )),
       loading: () => const Center(child: CircularProgressIndicator()),
     );
   }

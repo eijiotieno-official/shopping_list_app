@@ -21,7 +21,8 @@ class ColorNameView extends HookConsumerWidget {
           onTap: () => showPickColor(
             context: context,
             colors: colors,
-            shoppingList: shoppingList.copyWith(color: shoppingList.color ?? colors.first),
+            shoppingList: shoppingList.copyWith(
+                color: shoppingList.color ?? colors.first),
           ),
           child: Container(
             width: 40,
@@ -46,6 +47,7 @@ class ColorNameView extends HookConsumerWidget {
           ),
         ),
       ),
+      
     );
   }
 }

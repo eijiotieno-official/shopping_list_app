@@ -65,8 +65,10 @@ class ListItem extends HookConsumerWidget {
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize:
-                                Theme.of(context).textTheme.titleMedium?.fontSize,
+                            fontSize: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.fontSize,
                           ),
                         ),
                       ),
@@ -126,13 +128,14 @@ class ListItem extends HookConsumerWidget {
                                   ),
                                   if (count > 0)
                                     TextSpan(
-                                      text: "${items[index].count}",
+                                      text: " ${items[index].count}",
                                       style: TextStyle(
                                         color: Theme.of(context)
                                             .textTheme
                                             .bodyLarge
                                             ?.color
                                             ?.withOpacity(0.5),
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                 ],
