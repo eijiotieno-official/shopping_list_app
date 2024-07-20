@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shopping_list_app/list/models/shopping_list_model.dart';
 import 'package:shopping_list_app/list/notifiers/list_notifier.dart';
 import 'package:shopping_list_app/list/ui/screens/list_screen.dart';
+import 'package:shopping_list_app/shared/utils/string_utils.dart';
 
 class CreateListNameView extends HookConsumerWidget {
   final ShoppingList? shoppingList;
@@ -29,7 +30,7 @@ class CreateListNameView extends HookConsumerWidget {
     }, [nameController]);
 
     Future<void> save() async {
-      final id = shoppingList?.id ?? UniqueKey().toString();
+      final id = shoppingList?.id ?? StringUtils.generatedID();
 
       final items = shoppingList?.items ?? [];
 

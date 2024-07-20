@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shopping_list_app/item/models/shopping_item_model.dart';
 import 'package:shopping_list_app/list/models/shopping_list_model.dart';
 import 'package:shopping_list_app/list/notifiers/list_notifier.dart';
+import 'package:shopping_list_app/shared/utils/string_utils.dart';
 
 /// Widget for creating or updating a shopping item.
 class CreateItemView extends HookConsumerWidget {
@@ -35,8 +36,8 @@ class CreateItemView extends HookConsumerWidget {
         }
         await ref
             .read(shoppingListsProvider.notifier)
-            .updateShoppingList(shoppingList.copyWith(items: items));
-        Navigator.pop(context);
+            .updateShoppingList(shoppingList.copyWith(items: items))
+            .then((_) => Navigator.pop(context));
       },
     );
   }
@@ -282,7 +283,7 @@ class CreateItemForm extends HookWidget {
     TextEditingController priceController,
     List<int>? imageData,
   ) async {
-    final id = shoppingItem?.id ?? UniqueKey().toString();
+    final id = shoppingItem?.id ?? StringUtils.generatedID();
     final count = int.tryParse(countController.text.trim()) ?? 0;
     final price = double.tryParse(priceController.text.trim()) ?? 0.0;
     final bought = shoppingItem?.bought ?? false;
